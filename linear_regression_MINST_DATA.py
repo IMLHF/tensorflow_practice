@@ -29,21 +29,32 @@ __session = tf.InteractiveSession()
 # 初始化权重变量
 __session.run(tf.global_variables_initializer())
 
-# 构建回归模型
-__output_y = tf.nn.softmax(tf.matmul(__input_x, __W) + __b)
+__logits = tf.matmul(__input_x, __W) + __b
+# 构建回归模型(0-9的概率)
+__output_y = tf.nn.softmax(__logits)
+# 使用交叉熵作为损失函数
+__cross_entropy = tf.reduce_mean(
+    -tf.reduce_sum(__train_y_true*tf.log(__output_y)))
 
-# 交叉熵（损失函数）
-__cross_entropy = -tf.reduce_sum(__train_y_true*tf.log(__output_y))
+# ？
+# __cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
+#     logits=__logits, labels=__train_y_true))
 
 # region 训练
 # 使用梯度下降法优化模型，学习率为0.01。
 # 训练周期为1000，每个训练周期使用60个样本
-__train_session = tf.train.GradientDescentOptimizer(0.01
-                                                    ).minimize(__cross_entropy)
+__train_op = tf.train.GradientDescentOptimizer(
+    0.01).minimize(__cross_entropy)
 for i in range(1000):
   __batch = __mnist.train.next_batch(60)
-  __train_session.run(
-      feed_dict={__input_x: __batch[0], __train_y_true: __batch[1]})
+  __session.run(
+      __train_op, feed_dict={__input_x: __batch[0], __train_y_true: __batch[1]})
+  # tmp = __session.run(
+  #     __output_y, feed_dict={__input_x: __batch[0], __train_y_true: __batch[1]})
+  # for tt in tmp:
+  #   for pp in tt:
+  #     print("%.2f, " % pp, end="")
+  #   print()
 # endregion
 
 
@@ -51,10 +62,10 @@ for i in range(1000):
 # 从测试集取200个样本测试
 __test_x, __test_y_true = __mnist.test.next_batch(200)
 
+
 # 使用训练好的模型预测测试集结果（得到一个list）
 __perdict_num_list = __session.run(
     tf.argmax(__output_y, 1), feed_dict={__input_x: __test_x})
-    
 __accuracy = 0
 for i in range(len(__test_x)):
   __test_y_true_i = np.argmax(__test_y_true[i])
@@ -68,5 +79,6 @@ for i in range(len(__test_x)):
     print(', Answer: fail')
 print("Accuracy:", __accuracy)
 # endregion
+
 
 __session.close()
