@@ -18,11 +18,11 @@ tf.nn.conv2d 卷积函数
 返回 Tensor
 '''
 def conv2d(__x_input, __conv_kernel):
-  return tf.nn.conv2d(__x_input, __conv_kernel, strides=[1, 1, 1, 1], padding='SAME')
+  return tf.nn.conv2d(__x_input, __conv_kernel, strides=[1, 1, 1, 1], padding='VALID')
 
 
 '''
-tf.nn.max_pool 卷积函数
+tf.nn.max_pool 池化函数
 参数 value 输入图像               四维，shape如[batch_num, height, width, channels]
 参数 ksize 池化窗口大小            列表[batch, height, width, channels]
 参数 strides 池化窗口移动步长       列表[batch, height, width, channels]，
@@ -43,9 +43,9 @@ __weights = {
     '__w_conv1': tf.Variable(tf.truncated_normal(shape=[5, 5, 1, 32], stddev=0.1)),
     # [filter_height, filter_width, in_channels, out_channels]
     # 5x5x32x64,同样是卷积核的视野大小是5x5，因为上一层使用了32个filter，
-    # 所以上层生成结果的通道为32，该层卷积核有32个filter
+    # 所以上层生成结果的通道为32，该层卷积核有64个filter
     '__w_conv2': tf.Variable(tf.truncated_normal(shape=[5, 5, 32, 64], stddev=0.1)),
-    '__w_fc1': tf.Variable(tf.truncated_normal(shape=[7 * 7 * 64, 1024], stddev=0.1)),
+    '__w_fc1': tf.Variable(tf.truncated_normal(shape=[4 * 4 * 64, 1024], stddev=0.1)),
     '__w_fc2': tf.Variable(tf.truncated_normal(shape=[1024, 10], stddev=0.1)),
 }
 __biases={
@@ -61,9 +61,11 @@ def conv_net(__x_t,__keep_probability_t):
   __x_image = tf.reshape(__x_t, [-1, 28, 28, 1])
   __h_conv1 = tf.nn.relu(conv2d(__x_image, __weights['__w_conv1']) + __biases['__b_conv1'])
   __h_pool1 = max_pooling_2x2(__h_conv1)
+  print(tf.shape(__h_pool1))
   __h_conv2 = tf.nn.relu(conv2d(__h_pool1, __weights['__w_conv2']) + __biases['__b_conv2'])
   __h_pool2 = max_pooling_2x2(__h_conv2)
-  __h_pool2_flat = tf.reshape(__h_pool2, [-1, 7 * 7 * 64])
+  print(tf.shape(__h_pool2))
+  __h_pool2_flat = tf.reshape(__h_pool2, [-1, 4 * 4 * 64])
   __h_fc1 = tf.nn.relu(tf.matmul(__h_pool2_flat, __weights['__w_fc1']) + __biases['__b_fc1'])
 
   # tf.nn.dropout(x, keep_prob, noise_shape=None, seed=None, name=None)
@@ -102,6 +104,7 @@ init=tf.global_variables_initializer()
 
 with tf.Session() as __session_t:
   __session_t.run(init)
+
   for i in range(__training_epochs):
     # Datasets.train.next_batch 获取批量处样本
     # 返回 [image,label]
