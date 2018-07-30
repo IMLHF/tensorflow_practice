@@ -17,7 +17,7 @@ mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
 # In this example, we limit mnist data
 Xtr, Ytr = mnist.train.next_batch(60000)  # 5000 for training (nn candidates)
-Xte, Yte = mnist.test.next_batch(5)  # 200 for testing
+Xte, Yte = mnist.test.next_batch(200)  # 200 for testing
 
 # tf Graph Input
 xtr = tf.placeholder("float", [60000, 784])
@@ -25,9 +25,9 @@ xte = tf.placeholder("float", [784])
 
 
 # Nearest Neighbor calculation using L1 Distance
-# Calculate L1 Distance
+#计算曼哈顿距离
 distance = tf.reduce_sum(
-    tf.abs(tf.add(xtr, tf.negative(xte))), reduction_indices=1)
+    tf.abs(tf.add(xtr, tf.negative(xte))), axis=1)
 # Prediction: Get min distance index (Nearest neighbor)
 pred = tf.arg_min(distance, 0)
 
