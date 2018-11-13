@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
+import numpy as np
 
 __mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
 __learning_rate=0.0001
-__training_epochs = 600
+__training_epochs = 200
 __batch_size = 100  # 每批训练数据的大小
 __display_step = 10  # 每隔__display_step批次显示一次进度
 
@@ -60,11 +61,13 @@ def conv_net(__x_t,__keep_probability_t):
   #shape，-1表示有此维度，但是数值不定
   __x_image = tf.reshape(__x_t, [-1, 28, 28, 1])
   __h_conv1 = tf.nn.relu(conv2d(__x_image, __weights['__w_conv1']) + __biases['__b_conv1'])
+  print(np.shape(__h_conv1))
   __h_pool1 = max_pooling_2x2(__h_conv1)
-  print(tf.shape(__h_pool1))
+  print(np.shape(__h_pool1))
   __h_conv2 = tf.nn.relu(conv2d(__h_pool1, __weights['__w_conv2']) + __biases['__b_conv2'])
+  print(np.shape(__h_conv2))
   __h_pool2 = max_pooling_2x2(__h_conv2)
-  print(tf.shape(__h_pool2))
+  print(np.shape(__h_pool2))
   __h_pool2_flat = tf.reshape(__h_pool2, [-1, 4 * 4 * 64])
   __h_fc1 = tf.nn.relu(tf.matmul(__h_pool2_flat, __weights['__w_fc1']) + __biases['__b_fc1'])
 

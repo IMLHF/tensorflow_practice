@@ -17,7 +17,7 @@ __display_step = 100
 # Network Parameters
 __num_input = 28  # 输入
 __timesteps = 28  # 时间轴
-__num_hidden = 128  # 隐层数量
+__num_hidden = 128  # lstm cell的数量
 __num_classes = 10  # 分类数量
 
 # tf Graph input
@@ -48,7 +48,7 @@ def RNN(__x_t, __weights, __biases):
   # 获取lstm单元输出
   __outputs, __states = rnn.static_rnn(__lstm_cell, __x_t, dtype=tf.float32)
 
-  # Linear activation, using rnn inner loop last output
+
   return tf.matmul(__outputs[-1], __weights['out']) + __biases['out']
 
 

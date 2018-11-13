@@ -17,9 +17,9 @@ __mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
 # 模型训练相关参数
 __learning_rate = 0.001
-__training_epochs = 15
-__batch_size = 100  # 每批训练数据的大小
-__display_step = 1  # 每隔__display_step批次显示一次进度
+__training_epochs = 10
+__batch_size = 128  # 每批训练数据的大小
+__display_step = 1  # 每隔__display_step周期显示一次进度
 
 # 神经网络参数
 __n_hidden_1 = 256  # 隐层第一层神经元个数
@@ -61,10 +61,10 @@ if __name__ == '__main__':
   # 使用softmax建立回归模型
   # # 使用交叉熵作为损失函数
   '''三种不同的方法求交叉熵'''
-  __loss_cross_entropy = - \
-      tf.reduce_mean(__Y_true*tf.nn.log_softmax(_logits))  # 准确率在95%左右
-  # __loss_cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
-  #     logits=_logits, labels=__Y_true)) # 准确率在95%左右
+  # __loss_cross_entropy = - \
+  #     tf.reduce_mean(__Y_true*tf.nn.log_softmax(_logits))  # 准确率在95%左右
+  __loss_cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
+      logits=_logits, labels=__Y_true)) # 准确率在95%左右
   # __loss_cross_entropy = -tf.reduce_mean(__Y_true*tf.log(tf.nn.softmax(_logits))) # 准确率在75%左右
 
   # 使用Adam算法优化模型
@@ -81,6 +81,7 @@ if __name__ == '__main__':
       __total_batch = int(__mnist.train.num_examples/__batch_size)
       for i in range(__total_batch):
         __x_batch, __y_batch = __mnist.train.next_batch(__batch_size)
+        # print(__y_batch[0])
         __nouse, __loss_t = __session_t.run([__train_op, __loss_cross_entropy],
                                             feed_dict={__X_input: __x_batch,
                                                        __Y_true: __y_batch})
