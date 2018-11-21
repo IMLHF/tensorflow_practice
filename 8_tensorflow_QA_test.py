@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+#tensorflow question.pdf的部分测试代码
 
 def mat_mul():
   A = tf.random_normal([2, 1, 4, 5])
