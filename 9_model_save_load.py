@@ -6,7 +6,7 @@ import shutil
 decode=False
 resume_training=False
 
-save_dir='_'+__file__[:__file__.rfind('.')]
+save_dir='_'+__file__[__file__.rfind('/')+1:__file__.rfind('.')]
 
 if not decode:
   if os.path.exists(save_dir):
@@ -59,6 +59,6 @@ with graph.as_default():
             print('Error,checkpoint not exist,can\'t reject training.')
         else:
           saver.save(sess,os.path.join(save_dir,'epoch_%02d' % (i_epoch+1)))
-          print("Traing accepted.")
+          print("Training accepted.")
         print('#########################')
 
